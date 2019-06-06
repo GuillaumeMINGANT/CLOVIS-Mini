@@ -14,7 +14,7 @@
 # This work is protect by a Creative Commons licenses :
   https://creativecommons.org/licenses/by-nc-nd/4.0/
 
-# if you want to make a DURIN, use a part of it, or contribute, please contact me before :
+# if you want to make an Atlas Mini, use a part of it, or contribute, please contact me before :
   mingant.guillaume.frederic@gmail.com
   
   I will be glad to discuss about this project with you :) !
