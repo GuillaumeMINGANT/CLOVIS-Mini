@@ -1,4 +1,4 @@
-# Atlas Mini : DURIN
+# CLOVIS Mini : DURIN
   DURIN is our prototype of MRG-01:CLOVIS, our 3th concept of a mech frame, and the first one integraly CAD.
   
   DURIN is a 45cm for 5 kg humanoid robot, with 18 AX-18A and 4 AX-12A. 
