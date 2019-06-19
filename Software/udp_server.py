@@ -4,6 +4,7 @@ from threading import Thread
 from typing import Optional
 from Message import *
 import hashlib
+from robot_datas import *
 
 
 class UDPServer:
@@ -35,12 +36,11 @@ class UDPServer:
             self.socket: socket.socket = socket.socket(socket.AF_INET,  # Internet
                                                        socket.SOCK_DGRAM)  # UDP
             self.hash_pass = hash_pass
-            # A MODIFIER
+            self.robot = RobotDatas()
 
             self.client_is_connected: bool = True
             self.client_ip: str = ""
             self.client_port: int = 0
-            # ===========
 
             self.send_socket = socket.socket(socket.AF_INET,  # Internet
                                              socket.SOCK_DGRAM)
@@ -61,6 +61,10 @@ class UDPServer:
                 message = Message.check_message(data_string)
                 if message.id == 1:
                     self.connection(message, addr)
+                if message.id == 3:
+                    self.send(str(self.robot), 4)
+                if message.id == 5:
+                    self.send('{ "answer" : 1 }', 6)
 
         def verif_pass(self, pass_to_verif: str) -> bool:
             """"Verify if the password entered by client is the one of the server"""
@@ -98,7 +102,7 @@ class UDPServer:
             """
             self.is_running = False
 
-        def send(self, message: str, message_id: Optional[int] = 0):
+        def send(self, message: object, message_id: object = 0) -> object:
             """
             Send a message to the client
             :param message:
