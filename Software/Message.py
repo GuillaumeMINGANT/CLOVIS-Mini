@@ -15,12 +15,20 @@ class Message:
         self.content = dict()
 
     def create_json(msg: str):
+        """
+        Load a json file and store it in a message object
+        :return:
+        """
         json_dict = json.loads(msg)
         rcv_msg = Message(0, "")
         rcv_msg.import_json(json_dict)
         return rcv_msg
 
     def verif(self) -> bool:
+        """
+        Check if the message is corrupted
+        :return:
+        """
         if self.parity_check(bytes(self.message, "utf8")) != self.parity:
             print("Fatal Error: parity")
             return False
@@ -29,6 +37,18 @@ class Message:
             return False
         else:
             return True
+
+    def check_message(data_string: str):
+        try:
+            message = Message.create_json(data_string)
+        except ValueError:
+            print("Validation KO")
+            return Message(0, "")
+        if message.verif():
+            print("received message:", message.message)
+            return message
+        else:
+            return Message(0, "")
 
     def import_json(self, json_in):
         if "id" in json_in and "parity" in json_in and "len" in json_in and "message" in json_in:
