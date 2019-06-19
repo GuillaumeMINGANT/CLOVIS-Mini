@@ -39,6 +39,8 @@ class RobotDatas:
         for i in self.motor_keys:
             self.angle_settings[i] = [0, 0]
 
+        self.init_angle_settings()
+
     def __iter__(self):
         yield "current_position", self.current_position
         yield "imu_datas", self.imu_datas

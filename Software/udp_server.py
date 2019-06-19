@@ -26,6 +26,9 @@ class UDPServer:
 
         self.listener.send(message, message_id)
 
+    def get_robot_data(self):
+        return self.listener.robot
+
     class Listener(Thread):
 
         def __init__(self, ip: str, port: int, hash_pass: str) -> None:
@@ -55,7 +58,7 @@ class UDPServer:
             while self.is_running:
                 data, addr = self.socket.recvfrom(2048)  # buffer size is 1024 bytes
 
-                 # DEBUG A ENLEVER PLUS TARD
+                # DEBUG A ENLEVER PLUS TARD
                 data_string = data.decode("utf-8")
 
                 message = Message.check_message(data_string)
@@ -64,6 +67,7 @@ class UDPServer:
                 if message.id == 3:
                     self.send(str(self.robot), 4)
                 if message.id == 5:
+                    self.robot.set_targets(message.content)
                     self.send('{ "answer" : 1 }', 6)
 
         def verif_pass(self, pass_to_verif: str) -> bool:
