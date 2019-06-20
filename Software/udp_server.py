@@ -1,4 +1,4 @@
-from __future__ import annotations
+# from __future__ import annotations
 import socket
 from threading import Thread
 from typing import Optional
@@ -10,18 +10,46 @@ from robot_datas import *
 class UDPServer:
 
     def __init__(self, ip: str, port: int, password: Optional[str] = "") -> None:
+        """
+        Creat a new UDPServer object
+        :param ip:
+        The ip we want to use for the server
+        :param port:
+        The port we want to use for the server
+        :param password:
+        The password of the server
+        """
         self.ip: str = ip
         self.port: int = port
         self.hash_pass = hashlib.sha1(bytes(password, "utf8")).hexdigest()
         self.listener = self.Listener(self.ip, self.port, self.hash_pass)
 
     def start(self) -> None:
+        """
+        Start the Server
+        :return:
+        None
+        """
         self.listener.start()
 
     def stop(self) -> None:
+        """
+        Stop the server
+        :return:
+        None
+        """
         self.listener.stop()
 
     def send(self, message: str, message_id: Optional[int] = 0):
+        """
+        Send a message to the client
+        :param message:
+        The string to send
+        :param message_id:
+        The id of the message (default = 0)
+        :return:
+        None
+        """
         # if message_id == 1:
 
         self.listener.send(message, message_id)
@@ -32,6 +60,15 @@ class UDPServer:
     class Listener(Thread):
 
         def __init__(self, ip: str, port: int, hash_pass: str) -> None:
+            """
+            Creat a new Listener object
+            :param ip:
+            The ip we want to use for the server
+            :param port:
+            The port we want to use for the server
+            :param hash_pass:
+            The hashed password of the server
+            """
             Thread.__init__(self)
             self.is_running: bool = False
             self.ip: str = ip
@@ -71,7 +108,13 @@ class UDPServer:
                     self.send('{ "answer" : 1 }', 6)
 
         def verif_pass(self, pass_to_verif: str) -> bool:
-            """"Verify if the password entered by client is the one of the server"""
+            """
+            Verify if the password entered by client is the one of the server
+            :param pass_to_verif:
+            Hashed password to compare with the password of the server
+            :return:
+            Bool : True if the password is correct, else False
+            """
 
             if self.hash_pass == pass_to_verif:
                 print("Password accepted")
@@ -81,8 +124,11 @@ class UDPServer:
                 return False
 
         def connection(self, message: Message, addr):
-            """"If the password is correct, send the right message to finalise the connection with client"""
-
+            """
+            Send connexion request while it receive no CONNECTED answer
+            :return:
+            None
+            """
             if "pass" in message.content:
                 if message.content["pass"] == self.hash_pass:
                     self.client_port = addr[1]
@@ -95,6 +141,7 @@ class UDPServer:
             """
             Start the listener
             :return:
+            None
             """
             self.is_running = True
             self.listen()
@@ -103,10 +150,11 @@ class UDPServer:
             """
             Stop the listener
             :return:
+            None
             """
             self.is_running = False
 
-        def send(self, message: object, message_id: object = 0) -> object:
+        def send(self, message: str, message_id: Optional[int] = 0) -> None:
             """
             Send a message to the client
             :param message:
@@ -116,5 +164,5 @@ class UDPServer:
             :return:
             None
             """
-            datas_to_send = Message(message_id, message)
-            self.socket.sendto(bytes(str(datas_to_send), 'utf-8'), (self.client_ip, self.client_port))
+            data_to_send = Message(message_id, message)
+            self.socket.sendto(bytes(str(data_to_send), 'utf-8'), (self.client_ip, self.client_port))
