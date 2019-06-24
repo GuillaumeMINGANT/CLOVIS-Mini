@@ -5,6 +5,7 @@ from typing import Optional
 from Message import *
 import hashlib
 from robot_datas import *
+import time
 
 
 class UDPServer:
@@ -55,7 +56,22 @@ class UDPServer:
         self.listener.send(message, message_id)
 
     def get_robot_data(self):
-        return self.listener.robot
+        return self.listener.robot.copy()
+
+    def get_targets_data(self):
+        return self.listener.robot.get_targets_data()
+
+    def get_current_position_data(self):
+        return self.listener.robot.get_current_position_data()
+
+    def get_imu_datas(self):
+        return self.listener.robot.get_imu_data()
+
+    def get_lidar_datas(self):
+        return self.listener.robot.get_lidar_data()
+
+    def get_angle_settings_data(self):
+        return self.listener.robot.get_angle_settings_data()
 
     class Listener(Thread):
 
@@ -166,3 +182,6 @@ class UDPServer:
             """
             data_to_send = Message(message_id, message)
             self.socket.sendto(bytes(str(data_to_send), 'utf-8'), (self.client_ip, self.client_port))
+
+
+

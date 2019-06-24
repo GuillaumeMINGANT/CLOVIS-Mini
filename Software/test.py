@@ -1,26 +1,11 @@
-from robot_datas import *
-from Message import *
-import json
-import ast
-import hashlib
-import getpass
-"""
-msg = str(Message(1, '{"a" : 12, "b":"coucou"}'))
+from udp_server import *
+import time
+from Controller import Controller
+server = UDPServer("192.168.43.154", 50055, "test")
+server.start()
+motor = Controller(server)
 
-parity_check = lambda msg: reduce(lambda x, y: int(x) ^ int(y),
-                                  "".join([bin(msg[i])[2:] for i in range(len(msg))]), 0)
-
-dico = json.loads(msg)
-
-rcv_msg = Message(0, "")
-rcv_msg = Message.create_json(msg)
-print(rcv_msg.verif())
-print(type(rcv_msg))
-
-
-
-new_dico = json.dumps(rcv_msg.message)
-new_dico.replace("\\",'')
-d = json.loads(new_dico)
-d = json.loads(d)
-"""
+#motor.test()
+blabla = server.listener.robot.get_targets_data()
+blabla["torsoRY"] = 10
+print(server.listener.robot.get_targets_data()["torsoRY"])
