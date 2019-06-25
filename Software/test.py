@@ -1,11 +1,55 @@
-from udp_server import *
-import time
-from Controller import Controller
-server = UDPServer("192.168.43.154", 50055, "test")
-server.start()
-motor = Controller(server)
+import FaBo9Axis_MPU9250
 
-#motor.test()
-blabla = server.listener.robot.get_targets_data()
-blabla["torsoRY"] = 10
-print(server.listener.robot.get_targets_data()["torsoRY"])
+import time
+
+import sys
+
+print ("I AM WORKING AHAHAHAHAHAHAHAHAHAHAHAAHH")
+
+mpu9250 = FaBo9Axis_MPU9250.MPU9250()
+
+ 
+
+try:
+
+    while True:
+
+        accel = mpu9250.readAccel()
+
+        print(" ax = " + str( accel['x'] ))
+
+        print(" ay = " , ( accel['y'] ))
+
+        print(" az = " , ( accel['z'] ))
+
+ 
+
+        gyro = mpu9250.readGyro()
+
+        print(" gx = " , ( gyro['x'] ))
+
+        print(" gy = " , ( gyro['y'] ))
+
+        print(" gz = " , ( gyro['z'] ))
+
+ 
+
+        mag = mpu9250.readMagnet()
+
+        print(" mx = " , ( mag['x'] ))
+
+        print(" my = " , ( mag['y'] ))
+
+        print(" mz = " , ( mag['z'] ))
+
+        print
+
+ 
+
+        time.sleep(0.1)
+
+ 
+
+except KeyboardInterrupt:
+
+    sys.exit()

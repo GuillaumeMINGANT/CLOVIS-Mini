@@ -54,6 +54,18 @@ class UDPServer:
         # if message_id == 1:
 
         self.listener.send(message, message_id)
+    
+    def set_targets(self, input_target: Dict[str, float]):
+       return self.listener.robot.set_targets(input_target)
+        
+    def set_current_position(self, input_position: Dict[str, float]):
+        return self.listener.robot.set_current_position_data(input_position)
+
+    def set_imu_datas(self, input_data: Dict[str, float]):
+        return self.listener.robot.set_imu_datas(input_data)
+
+    def set_lidar_data(self, input_lidar: List[Point]):
+        return self.listener.robot.set_lidar_data(input_lidar)
 
     def get_robot_data(self):
         return self.listener.robot.copy()
