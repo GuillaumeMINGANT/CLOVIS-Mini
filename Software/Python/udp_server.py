@@ -66,6 +66,12 @@ class UDPServer:
 
     def set_lidar_data(self, input_lidar: List[Point]):
         return self.listener.robot.set_lidar_data(input_lidar)
+        
+    def set_motor_change(self, input_change: Dict[str, bool]):
+        return self.listener.robot.set_motor_change(input_change)
+        
+    def set_motor_id(self, input_id: Dict[str, int]):
+        return self.listener.robot.set_motor_id(input_id)
 
     def get_robot_data(self):
         return self.listener.robot.copy()
@@ -84,6 +90,12 @@ class UDPServer:
 
     def get_angle_settings_data(self):
         return self.listener.robot.get_angle_settings_data()
+        
+    def get_motor_id(self):
+        return self.listener.robot.get_motor_id()
+   
+    def get_motor_targets_change(self):
+        return self.listener.robot.get_motor_targets_change()
 
     class Listener(Thread):
 

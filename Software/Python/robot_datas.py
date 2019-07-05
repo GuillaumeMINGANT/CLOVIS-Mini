@@ -38,7 +38,17 @@ class RobotDatas:
         self.angle_settings: Dict[str, List[int, int]] = {}
         for i in self.motor_keys:
             self.angle_settings[i] = [0, 0]
-
+            
+        id: int = 1
+        self.motor_id : Dict[str, int] = {}
+        for i in self.motor_keys:
+                self.motor_id[i] = id
+                id += 1
+        
+        self.motor_targets_change : Dict[str, bool] = {}
+        for i in self.motor_keys:
+             self.motor_targets_change[i] = False
+        
         self.init_angle_settings()
 
     def __iter__(self):
@@ -50,8 +60,8 @@ class RobotDatas:
         return json.dumps(dict(self))
 
     def init_angle_settings(self):
-        self.angle_settings["rAnkleRX"] = [-30, 30]
-        self.angle_settings["lAnkleRX"] = [-30, 30]
+        self.angle_settings["rAnkleRX"] = [-180, 180]
+        self.angle_settings["lAnkleRX"] = [-180, 180]
         self.angle_settings["rAnkleRZ"] = [-30, 30]
         self.angle_settings["lAnkelRZ"] = [-30, 30]
         self.angle_settings["rShoulderRY"] = [-90, 0]
@@ -77,12 +87,29 @@ class RobotDatas:
         for i in input_target:
             if i in self.motor_keys:
                 if input_target[i] > self.angle_settings[i][1]:
+                    prev_val = self.targets[i]
                     self.targets[i] = self.angle_settings[i][1]
+                    
                 elif input_target[i] < self.angle_settings[i][0]:
+                    prev_val = self.targets[i]
                     self.targets[i] = self.angle_settings[i][1]
+                    
                 else:
+                    prev_val = self.targets[i]
                     self.targets[i] = input_target[i]
-
+                if prev_val != self.targets[i]:
+                    self.motor_targets_change[i] = True
+                
+    def set_motor_id(self, input_id: Dict[str, int]):
+        for i in input_id:
+            if i in self.motor_keys:
+                self.motor_id[i] = input_id[i]
+   
+    def set_motor_change(self, input_change: Dict[str, bool]):
+        for i in input_change:
+            if i in self.motor_keys:
+                self.motor_targets_change[i] = input_change[i] 
+                
     def set_current_position(self, input_position: Dict[str, float]):
         for i in input_position:
             if i in self.motor_keys:
@@ -110,6 +137,12 @@ class RobotDatas:
 
     def get_angle_settings_data(self):
         return self.angle_settings.copy()
+        
+    def get_motor_id(self):
+        return self.motor_id.copy()
+   
+    def get_motor_targets_change(self):
+        return self.motor_targets_change.copy()
 
     def copy(self):
         robot_copy = RobotDatas()
@@ -118,4 +151,6 @@ class RobotDatas:
         robot_copy.imu_data = self.imu_data.copy()
         robot_copy.current_position = self.current_position.copy()
         robot_copy.targets = self.targets.copy()
+        robot_copy.motor_id = self.motor_id()
+        robot_copy.motor_targets_change = self.motor_targets_change()
         return robot_copy
