@@ -70,10 +70,9 @@ void loop()
         data += ":"; 
         data += (String)(int)(GetTorque(i) * 0.1);
         if(i < angle){
-          data += "/"; 
+         data += "/"; 
         }       
       }
-      data += "\n";
       Serial.println(data);
 
 

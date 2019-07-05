@@ -56,22 +56,28 @@ class UDPServer:
         self.listener.send(message, message_id)
     
     def set_targets(self, input_target: Dict[str, float]):
-       return self.listener.robot.set_targets(input_target)
+        self.listener.robot.set_targets(input_target)
         
     def set_current_position(self, input_position: Dict[str, float]):
-        return self.listener.robot.set_current_position_data(input_position)
+        self.listener.robot.set_current_position_data(input_position)
 
     def set_imu_datas(self, input_data: Dict[str, float]):
-        return self.listener.robot.set_imu_datas(input_data)
+        self.listener.robot.set_imu_datas(input_data)
 
     def set_lidar_data(self, input_lidar: List[Point]):
-        return self.listener.robot.set_lidar_data(input_lidar)
+        self.listener.robot.set_lidar_data(input_lidar)
         
     def set_motor_change(self, input_change: Dict[str, bool]):
-        return self.listener.robot.set_motor_change(input_change)
+        self.listener.robot.set_motor_change(input_change)
         
     def set_motor_id(self, input_id: Dict[str, int]):
-        return self.listener.robot.set_motor_id(input_id)
+        self.listener.robot.set_motor_id(input_id)
+        
+    def set_motor_torque(self, input_torque: Dict[str, int]):
+        self.listener.robot.set_motor_torque(input_torque)
+        
+    def get_motor_torque(self):
+        return self.listener.robot.get_motor_torque()
 
     def get_robot_data(self):
         return self.listener.robot.copy()

@@ -24,25 +24,12 @@ class Controller(Thread):
         while self.is_running :
             self.IMU()
             self.send_new_targets()
-            #self.ask_motor_datas()
+            self.ask_motor_datas()
             
             
     def stop(self):
         self.is_running = False
         
-    def data_recovery(self):
-        while True:
-            #self.server.listener.robot.set_targets(self.robot.get_targets_data())
-            time.sleep(0.1)
-
-    def test(self):
-        for i in range(100):
-            print("*********************************************************************")
-            self.IMU()
-            print("*********************************************************************")
-
-            time.sleep(0.1)
-            
     def send_new_targets(self):
         motor_targets_change = self.server.get_motor_targets_change()
         motor_id = self.server.get_motor_id()
@@ -58,17 +45,38 @@ class Controller(Thread):
                 time.sleep(0.009)
                 
     def ask_motor_datas(self):
+        motor_id = self.server.get_motor_id()
+        
         nb_motors = len(self.server.get_targets_data())
         message = bytes('0' + ':' + str(nb_motors) +';', "ASCII")
         self.ser.write(message)
-        time.sleep(0.004 * nb_motors + 0.005)
-        msg = self.ser.readline().decode("ASCII")[:-1]
-        print(self.decode_motor_data(msg))
-                
+        time.sleep(0.002 * nb_motors + 0.005)
+        
+        try:
+            msg = self.ser.readline().decode("ASCII")[:-2]
+            data = self.decode_motor_data(msg)
+            if len(data) != nb_motors:
+                self.ask_motor_datas()
+            else:
+                new_values = {}
+                new_torque = {}
+                for i in data:
+                    
+                    if len(i) == 3:
+                        motor_name = list(motor_id.keys())[list(motor_id.values()).index(int(i[0]))]
+                        new_values[motor_name] = int(i[1]) - 180
+                        new_torque[motor_name] = int(i[2]) if int(i[2]) <= 100 else - (int(i[2]) - 100)
+                self.server.set_motor_torque(new_torque)
+                self.server.set_current_position(new_values)
+            
+        except ValueError:
+            self.ask_motor_datas()
+            print("ERRORRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR")
+                        
             
     def decode_motor_data(self, msg: str) -> List[List[str]]:
         raw_data = msg.split("/")
-        raw_data = raw_data[:]
+        raw_data = raw_data[:22]
         data = []
         for i in raw_data:
             data += [i.split(':')]

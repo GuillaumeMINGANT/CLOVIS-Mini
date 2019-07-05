@@ -48,6 +48,10 @@ class RobotDatas:
         self.motor_targets_change : Dict[str, bool] = {}
         for i in self.motor_keys:
              self.motor_targets_change[i] = False
+             
+        self.motor_torque : Dict[str, int] = {}
+        for i in self.motor_keys:
+             self.motor_torque[i] = 0
         
         self.init_angle_settings()
 
@@ -110,7 +114,7 @@ class RobotDatas:
             if i in self.motor_keys:
                 self.motor_targets_change[i] = input_change[i] 
                 
-    def set_current_position(self, input_position: Dict[str, float]):
+    def set_current_position_data(self, input_position: Dict[str, float]):
         for i in input_position:
             if i in self.motor_keys:
                 self.current_position[i] = input_position[i]
@@ -119,10 +123,19 @@ class RobotDatas:
         for i in input_data:
             if i in self.imu_keys:
                 self.imu_data[i] = input_data[i]
+                
+    def set_motor_torque(self, input_torque: Dict[str, int]) -> None:
+            for i in input_torque:
+                    if i in self.motor_keys:
+                        self.motor_torque[i] = input_torque[i]
+        
 
     def set_lidar_data(self, input_lidar: List[Point]):
         self.lidar_data = input_lidar
-
+        
+    def get_motor_torque(self):
+            return self.motor_torque.copy()
+        
     def get_targets_data(self):
         return self.targets.copy()
 
@@ -151,6 +164,7 @@ class RobotDatas:
         robot_copy.imu_data = self.imu_data.copy()
         robot_copy.current_position = self.current_position.copy()
         robot_copy.targets = self.targets.copy()
-        robot_copy.motor_id = self.motor_id()
-        robot_copy.motor_targets_change = self.motor_targets_change()
+        robot_copy.motor_id = self.motor_id.copy()
+        robot_copy.motor_targets_change = self.motor_targets_change.copy()
+        robot_copy.motor_torque = self.motor_torque.copy()
         return robot_copy
