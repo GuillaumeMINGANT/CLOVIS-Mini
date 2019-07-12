@@ -6,7 +6,7 @@ import json
 class RobotDatas:
 
     def __init__(self) -> None:
-        self.motor_keys: List[str] = ["rAnkleRX", "lAnkleRX", "rAnkleRZ", "lAnkelRZ", "rShoulderRY", "lShoulderBaseRY",
+        self.motor_keys: List[str] = ["rAnkleRX", "lAnkleRX", "rAnkleRZ", "lAnkleRZ", "rShoulderRY", "lShoulderBaseRY",
                                       "rShoulderBaseRY", "lShoulderRY", "rShoulderRZ", "lShoulderRZ", "rKneeRX",
                                       "lKneeRX",
                                       "rHipRX", "lHipRX", "rHipRY", "lHipRY", "rHipRZ", "lHipRZ", "headRX", "rElbowRX",
@@ -39,7 +39,7 @@ class RobotDatas:
         for i in self.motor_keys:
             self.angle_settings[i] = [0, 0]
             
-        id: int = 1
+        id: int = 2
         self.motor_id : Dict[str, int] = {}
         for i in self.motor_keys:
                 self.motor_id[i] = id
@@ -52,11 +52,17 @@ class RobotDatas:
         self.motor_torque : Dict[str, int] = {}
         for i in self.motor_keys:
              self.motor_torque[i] = 0
+             
+        self.motor_speed : Dict[str, float] = {}
+        for i in self.motor_keys:
+             self.motor_speed[i] = 0
         
         self.init_angle_settings()
 
     def __iter__(self):
         yield "current_position", self.current_position
+        yield "motor_speed", self.motor_speed
+        yield "motor_torque", self.motor_torque
         yield "imu_datas", self.imu_data
         yield "lidar_datas", self.lidar_data
 
@@ -66,8 +72,31 @@ class RobotDatas:
     def init_angle_settings(self):
         self.angle_settings["rAnkleRX"] = [-180, 180]
         self.angle_settings["lAnkleRX"] = [-180, 180]
+        self.angle_settings["rAnkleRZ"] = [-180, 180]
+        self.angle_settings["lAnkleRZ"] = [-180, 180]
+        self.angle_settings["rShoulderRY"] = [-180, 180]
+        self.angle_settings["lShoulderBaseRY"] = [-180, 180]
+        self.angle_settings["rShoulderBaseRY"] = [-180, 180]
+        self.angle_settings["lShoulderRY"] = [-180, 180]
+        self.angle_settings["rShoulderRZ"] =[-180, 180]
+        self.angle_settings["lShoulderRZ"] = [-180, 180]
+        self.angle_settings["rKneeRX"] = [-180, 180]
+        self.angle_settings["lKneeRX"] = [-180, 180]
+        self.angle_settings["rHipRX"] = [-180, 180]
+        self.angle_settings["lHipRX"] = [-180, 180]
+        self.angle_settings["rHipRY"] = [-180, 180]
+        self.angle_settings["lHipRY"] = [-180, 180]
+        self.angle_settings["rHipRZ"] = [-180, 180]
+        self.angle_settings["lHipRZ"] = [-180, 180]
+        self.angle_settings["headRX"] = [-180, 180]
+        self.angle_settings["rElbowRX"] = [-180, 180]
+        self.angle_settings["lElbowRX"] = [-180, 180]
+        self.angle_settings["torsoRY"] = [-180, 180]
+        """ 
+        self.angle_settings["rAnkleRX"] = [-180, 180]
+        self.angle_settings["lAnkleRX"] = [-180, 180]
         self.angle_settings["rAnkleRZ"] = [-30, 30]
-        self.angle_settings["lAnkelRZ"] = [-30, 30]
+        self.angle_settings["lAnkleRZ"] = [-30, 30]
         self.angle_settings["rShoulderRY"] = [-90, 0]
         self.angle_settings["lShoulderBaseRY"] = [-30, 30]
         self.angle_settings["rShoulderBaseRY"] = [-30, 30]
@@ -86,6 +115,7 @@ class RobotDatas:
         self.angle_settings["rElbowRX"] = [0, 90]
         self.angle_settings["lElbowRX"] = [-90, 0]
         self.angle_settings["torsoRY"] = [-90, 90]
+        """
 
     def set_targets(self, input_target: Dict[str, float]):
         for i in input_target:
@@ -128,6 +158,11 @@ class RobotDatas:
             for i in input_torque:
                     if i in self.motor_keys:
                         self.motor_torque[i] = input_torque[i]
+                        
+    def set_motor_speed(self, input_speed: Dict[str, int]) -> None:
+            for i in input_speed:
+                    if i in self.motor_keys:
+                        self.motor_speed[i] = input_speed[i]
         
 
     def set_lidar_data(self, input_lidar: List[Point]):
@@ -135,6 +170,9 @@ class RobotDatas:
         
     def get_motor_torque(self):
             return self.motor_torque.copy()
+        
+    def get_motor_speed(self):
+            return self.motor_speed.copy()
         
     def get_targets_data(self):
         return self.targets.copy()
@@ -167,4 +205,5 @@ class RobotDatas:
         robot_copy.motor_id = self.motor_id.copy()
         robot_copy.motor_targets_change = self.motor_targets_change.copy()
         robot_copy.motor_torque = self.motor_torque.copy()
+        robot_copy.motor_speed = self.motor_speed.copy()
         return robot_copy

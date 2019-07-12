@@ -76,6 +76,12 @@ class UDPServer:
     def set_motor_torque(self, input_torque: Dict[str, int]):
         self.listener.robot.set_motor_torque(input_torque)
         
+    def set_motor_speed(self, input_speed: Dict[str, int]):
+        self.listener.robot.set_motor_speed(input_speed)
+        
+    def get_motor_speed(self):
+        return self.listener.robot.get_motor_speed()
+        
     def get_motor_torque(self):
         return self.listener.robot.get_motor_torque()
 
@@ -124,7 +130,7 @@ class UDPServer:
             self.hash_pass = hash_pass
             self.robot = RobotDatas()
 
-            self.client_is_connected: bool = True
+            self.client_is_connected: bool = False
             self.client_ip: str = ""
             self.client_port: int = 0
 
@@ -147,11 +153,12 @@ class UDPServer:
                 message = Message.check_message(data_string)
                 if message.id == 1:
                     self.connection(message, addr)
-                if message.id == 3:
-                    self.send(str(self.robot), 4)
-                if message.id == 5:
-                    self.robot.set_targets(message.content)
-                    self.send('{ "answer" : 1 }', 6)
+                if self.client_is_connected == True:
+                    if message.id == 3:
+                        self.send(str(self.robot), 4)
+                    if message.id == 5:
+                        self.robot.set_targets(message.content)
+                        self.send('{ "answer" : 1 }', 6)
 
         def verif_pass(self, pass_to_verif: str) -> bool:
             """
@@ -179,6 +186,7 @@ class UDPServer:
                 if message.content["pass"] == self.hash_pass:
                     self.client_port = addr[1]
                     self.client_ip = addr[0]
+                    self.client_is_connected = True
                     self.send('{"answer" : "CONNECTED"}', 2)
                 else:
                     print(addr)

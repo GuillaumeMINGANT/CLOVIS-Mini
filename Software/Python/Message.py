@@ -59,7 +59,7 @@ class Message:
             print("Validation KO")
             return Message(0, "")
         if message.verif():
-            print("received message:", message.message)
+            #print("received message:", message.message)
             return message
         else:
             return Message(0, "")
