@@ -18,13 +18,16 @@ class Controller(Thread):
         self.ser = serial.Serial(serial_port, baud_rate)
         self.serial_port = serial_port
         self.baud_rate = baud_rate
+        self.buff = []
+        
             
     def run(self):
         self.is_running = True
         while self.is_running :
             self.IMU()
             self.send_new_targets()
-            #self.ask_motor_datas()
+            self.ask_motor_datas()
+            time.sleep(0.5)  #DEBUG
             
             
     def stop(self):
@@ -44,54 +47,45 @@ class Controller(Thread):
         for i in motor_targets_change : 
             if motor_targets_change[i] == True:
                 message += [motor_id[i]] + Controller.pos_to_bytes(int((motor_targets[i] + 180) * 2.84))
-                self.server.set_motor_change({i:False})
-       
-        print(message)
+                self.server.set_motor_change({i:False}) 
         self.ser.write(message)
         #time.sleep((len(message) / self.baud_rate))    #  avoid the overflow of the buffer
-        time.sleep(0.1)
+        time.sleep(0.1) #DEBUG
         self.ser.write(bytes(';', "ASCII"))
-        time.sleep(0.3)
+        time.sleep(0.3) #DEBUG
                 
     def ask_motor_datas(self):
         motor_id = self.server.get_motor_id()
+        nb_motors = len(motor_id)
         
-        nb_motors = len(self.server.get_targets_data())
-        message = bytes('0' + ':' + str(nb_motors) +';', "ASCII")
-        self.ser.write(message)
+        msg = [len(motor_id)]
+        self.ser.write(msg)
+
+        self.ser.write(bytes(';', "ASCII"))
         time.sleep(0.002 * nb_motors + 0.005)
         
         try:
-            msg = self.ser.readline().decode("ASCII")[:-2]
-            data = self.decode_motor_data(msg)
-            if len(data) != nb_motors:
-                self.ask_motor_datas()
-            else:
-                new_values = {}
-                new_speed = {}
-                new_torque = {}
-                for i in data:
-                    
-                    if len(i) == 4:
-                        motor_name = list(motor_id.keys())[list(motor_id.values()).index(int(i[0]))]
-                        new_values[motor_name] = int(i[1]) - 180
-                        new_speed[motor_name] = - (int(i[2]) * 0.111) if int(i[2]) <= 1023 else (int(i[2]) - 1023) * 0.111
-                        new_torque[motor_name] = - int(i[3]) if int(i[3]) <= 100 else (int(i[3]) - 100)
-                self.server.set_motor_torque(new_torque)
-                self.server.set_motor_speed(new_speed)
-                self.server.set_current_position(new_values)
-                
+            while self.ser.in_waiting != 0: 
+                caract = int.from_bytes(self.ser.read(), byteorder='big')           
+                self.buff += [caract]
+                if len(self.buff) == 3:
+                    if self.buff[0] != 255 and self.buff[1] != 255 and self.buff[2] != 255 :
+                        self.buff = []
+                elif len(self.buff) > 6:
+                    if self.buff[len(self.buff) -1] == 254 and self.buff[len(self.buff) - 2] == 254 and self.buff[len(self.buff) - 3] == 254 :
+                        raw_data = self.buff[3:-3]
+                        self.buff = []
+                        if len(raw_data)/nb_motors == 7:
+                            for i in range(nb_motors):
+                                name = list(motor_id.keys())[list(motor_id.values()).index(raw_data[i*7])]
+                                self.server.set_current_position({name : int((((raw_data[(i*7) + 1] * 256) + raw_data[(i*7) + 2]) / 2.84) - 180)})
+                                self.server.set_motor_speed({name : (raw_data[(i*7) + 3] * 256) + raw_data[(i*7) + 4]}) # FINIR CONVERSION
+                                self.server.set_motor_torque({name : (raw_data[(i*7) + 5] * 256) + raw_data[(i*7) + 6]}) # FINIR CONVERSION
+                            print(self.server.get_current_position_data())
+                                
         except:
             self.ask_motor_datas()
                         
-            
-    def decode_motor_data(self, msg: str) -> List[List[str]]:
-        raw_data = msg.split("/")
-        raw_data = raw_data[:22]
-        data = []
-        for i in raw_data:
-            data += [i.split(':')]
-        return data
         
             
     def IMU(self):

@@ -42,29 +42,35 @@ boolean read_message(){
   }
   
   if(top_buffer == 1){  // Send motor's data
-      
+    data[0] = (char)255; 
+    data[1] = (char)255;
+    data[2] = (char)255; 
     for(char i=0; i<buffer[0]; i++)
     {
-      data[i * 7] = (int)(i + FIRST_ID);
+      data[(i * 7) + 3] = (int)(i + FIRST_ID);
       
       int temp = (int)GetPosition(i + FIRST_ID);
-      data[(i * 7) + 1] = find_msb(temp);
-      data[(i * 7) + 2] = find_lsb(temp);
+      data[(i * 7) + 4] = find_msb(temp);
+      data[(i * 7) + 5] = find_lsb(temp);
       
       temp = (int)GetSpeed(i + FIRST_ID);
-      data[(i * 7) + 3] = find_msb(temp);
-      data[(i * 7) + 4] = find_lsb(temp);
+      data[(i * 7) + 6] = find_msb(temp);
+      data[(i * 7) + 7] = find_lsb(temp);
       
       temp = (int)GetTorque(i + FIRST_ID);
-      data[(i * 7) + 5] = find_msb(temp);
-      data[(i * 7) + 6] = find_lsb(temp);
+      data[(i * 7) + 8] = find_msb(temp);
+      data[(i * 7) + 9] = find_lsb(temp);
       } 
+      
+    data[(NB_MOTORS * 7) + 3] = 254; 
+    data[(NB_MOTORS * 7) + 4] = 254;
+    data[(NB_MOTORS * 7) + 5] = 254;
     //DEBUG
       
-    for (int i = 0; i < NB_MOTORS * 7; i++){
-      Serial.print(data[i]);
+    for (int i = 0; i < (NB_MOTORS * 7) + 6; i++){
+      Serial.write(data[i]);
     }
-    Serial.print('\n');
+    //Serial.print('\n');
 
 
     //fin DEBUG      
@@ -112,7 +118,7 @@ void setup(){
   buffer = (unsigned char *) malloc(BUFFER_SIZE * sizeof(unsigned char));
   id = (unsigned char *) malloc(NB_MOTORS * sizeof(unsigned char));
   pos = (unsigned int *) malloc(NB_MOTORS * sizeof(unsigned int));
-  data = (unsigned char *) malloc(NB_MOTORS * 7 * sizeof(unsigned char));
+  data = (unsigned char *) malloc(((NB_MOTORS * 7) + 6) * sizeof(unsigned char));
 }
 
 
