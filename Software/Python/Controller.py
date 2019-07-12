@@ -27,7 +27,6 @@ class Controller(Thread):
             self.IMU()
             self.send_new_targets()
             self.ask_motor_datas()
-            time.sleep(0.5)  #DEBUG
             
             
     def stop(self):
@@ -75,14 +74,15 @@ class Controller(Thread):
                     if self.buff[len(self.buff) -1] == 254 and self.buff[len(self.buff) - 2] == 254 and self.buff[len(self.buff) - 3] == 254 :
                         raw_data = self.buff[3:-3]
                         self.buff = []
-                        if len(raw_data)/nb_motors == 7:
+                        if len(raw_data)/nb_motors == 7:                            
                             for i in range(nb_motors):
                                 name = list(motor_id.keys())[list(motor_id.values()).index(raw_data[i*7])]
                                 self.server.set_current_position({name : int((((raw_data[(i*7) + 1] * 256) + raw_data[(i*7) + 2]) / 2.84) - 180)})
-                                self.server.set_motor_speed({name : (raw_data[(i*7) + 3] * 256) + raw_data[(i*7) + 4]}) # FINIR CONVERSION
-                                self.server.set_motor_torque({name : (raw_data[(i*7) + 5] * 256) + raw_data[(i*7) + 6]}) # FINIR CONVERSION
-                            print(self.server.get_current_position_data())
-                                
+                                speed = (raw_data[(i*7) + 3] * 256) + raw_data[(i*7) + 4]
+                                self.server.set_motor_speed({name : - (int(speed * (100/1024))) if speed <= 1023 else int((speed - 1023 ) * (100/1024)) })
+                                torque = (raw_data[(i*7) + 5] * 256) + raw_data[(i*7) + 6]
+                                self.server.set_motor_torque({name : - (int(torque * (100/1024))) if torque <= 1023 else int((torque - 1023 ) * (100/1024))})
+                            print("ok")
         except:
             self.ask_motor_datas()
                         
