@@ -1,7 +1,7 @@
-# CLOVIS Mini : DURIN
-  DURIN is our prototype of MRG-01:CLOVIS, our 3th concept of a mech frame, and the first one integraly CAD.
+# CLOVIS Mini
+  CLOVIS Mini is our prototype of MRG-01:CLOVIS, our first concept of a mech frame integraly CAD.
   
-  DURIN is a 45cm for 5 kg humanoid robot, with 18 AX-18A and 4 AX-12A. 
+  CLOVIS Mini is a 45cm for 5 kg humanoid robot, with 18 AX-18A and 4 AX-12A. 
   He have the same Degree Of Freedom than CLOVIS, who been inspire by Atlas from boston dynamics.
   Our goal is to devellope a dynamics walking model, and learn technologies reusable with CLOVIS.
   
@@ -9,7 +9,7 @@
   
   - CLOVIS :    https://www.prorok.fr/mrg-01-clovis
   
-  - DURIN :     https://www.prorok.fr/durin
+  - CLOVIS Mini :     https://www.prorok.fr/durin
   
 # This work is protect by a Creative Commons licenses :
   https://creativecommons.org/licenses/by-nc-nd/4.0/
