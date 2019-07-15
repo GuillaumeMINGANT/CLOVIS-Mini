@@ -11,6 +11,7 @@ const unsigned char FIRST_ID = 2;
 
 unsigned int top_buffer = 0;
 unsigned char * buffer;
+boolean buffer_is_full = false;
 
 unsigned int id_len = 0;
 unsigned int pos_len = 0;
@@ -32,20 +33,31 @@ boolean read_message(){
    *  Read the message if possible and write the required values in id and pos.
    */
   if(top_buffer % 3 == 0 && top_buffer != 0){
-    for(int i = 0; i < top_buffer / 3; i++){
+    for(int i = 1; i < (top_buffer / 3) - 1; i++){
       id[i] = buffer[i * 3];
-      pos[i] = buffer[i * 3 + 1] * 256 + buffer[i * 3 + 2];
+      int new_pos = buffer[i * 3 + 1] * 256 + buffer[i * 3 + 2];
+      if(new_pos < 0){
+        pos[i] = 0;
+      }
+      else if(new_pos > 1023){
+        pos[i] = 1023;
+      }
+      else{
+      pos[i] = new_pos;
+      }
     }
     id_len = top_buffer / 3;
     pos_len = id_len;
+    top_buffer = 0;
+    buffer_is_full = false;
     return true;
   }
   
-  if(top_buffer == 1){  // Send motor's data
+  if(top_buffer == 7){  // Send motor's data
     data[0] = (char)255; 
     data[1] = (char)255;
     data[2] = (char)255; 
-    for(char i=0; i<buffer[0]; i++)
+    for(char i=0; i<buffer[3]; i++)
     {
       data[(i * 7) + 3] = (int)(i + FIRST_ID);
       
@@ -65,19 +77,13 @@ boolean read_message(){
     data[(NB_MOTORS * 7) + 3] = 254; 
     data[(NB_MOTORS * 7) + 4] = 254;
     data[(NB_MOTORS * 7) + 5] = 254;
-    //DEBUG
-      
+
     for (int i = 0; i < (NB_MOTORS * 7) + 6; i++){
       Serial.write(data[i]);
+    }    
     }
-    //Serial.print('\n');
-
-
-    //fin DEBUG      
-    }
-      
-      
-    
+  top_buffer = 0;         
+  buffer_is_full = false;
   return false;
 }
 
@@ -124,25 +130,35 @@ void setup(){
 
 void loop(){
   if(Serial.available()){
-
-    int temp = Serial.read();
-    //Serial.println(temp);
-    if(temp != (int)END_TRANSMIT){
-      buffer[top_buffer] = temp;
+    
+    if(!buffer_is_full){
+      buffer[top_buffer] = Serial.read();
       top_buffer += 1;
+      
+      
+      if(top_buffer == 3){
+        if(buffer[0] != 255 || buffer[1] != 255 || buffer[2] != 255){         
+          buffer[0] = buffer[1];
+          buffer[1] = buffer[2];
+          top_buffer -= 1;          
+        }
+      }
+     if(top_buffer > 6){
+       if(buffer[top_buffer - 3] == 254 && buffer[top_buffer - 2] == 254 && buffer[top_buffer - 1] == 254){
+         buffer_is_full = true;           
+       }
+     }
+        
+
     }
     else{     
       if(read_message()){
-         move_motors();
-       
+         move_motors();      
       }
-      top_buffer = 0;
     }
 
 
   }
     delay(1);
-
-
 }
 

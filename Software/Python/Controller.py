@@ -41,29 +41,29 @@ class Controller(Thread):
         motor_targets_change = self.server.get_motor_targets_change()
         motor_id = self.server.get_motor_id()
         motor_targets = self.server.get_targets_data()
-        message = []
+        
+        message = [255, 255, 255]
         #time.sleep(0.02)
         for i in motor_targets_change : 
             if motor_targets_change[i] == True:
                 message += [motor_id[i]] + Controller.pos_to_bytes(int((motor_targets[i] + 180) * 2.84))
                 self.server.set_motor_change({i:False}) 
+        message += [254, 254, 254]
         self.ser.write(message)
+        
         #time.sleep((len(message) / self.baud_rate))    #  avoid the overflow of the buffer
-        time.sleep(0.1) #DEBUG
-        self.ser.write(bytes(';', "ASCII"))
         time.sleep(0.3) #DEBUG
                 
     def ask_motor_datas(self):
         motor_id = self.server.get_motor_id()
         nb_motors = len(motor_id)
         
-        msg = [len(motor_id)]
+        msg = [255, 255, 255, nb_motors, 254, 254, 254]
         self.ser.write(msg)
-
-        self.ser.write(bytes(';', "ASCII"))
         time.sleep(0.002 * nb_motors + 0.005)
         
         try:
+            
             while self.ser.in_waiting != 0: 
                 caract = int.from_bytes(self.ser.read(), byteorder='big')           
                 self.buff += [caract]
@@ -82,7 +82,7 @@ class Controller(Thread):
                                 self.server.set_motor_speed({name : - (int(speed * (100/1024))) if speed <= 1023 else int((speed - 1023 ) * (100/1024)) })
                                 torque = (raw_data[(i*7) + 5] * 256) + raw_data[(i*7) + 6]
                                 self.server.set_motor_torque({name : - (int(torque * (100/1024))) if torque <= 1023 else int((torque - 1023 ) * (100/1024))})
-                            print("ok")
+        
         except:
             self.ask_motor_datas()
                         

@@ -181,35 +181,29 @@ count = 0
 
 while True:
 	
-	msg = [22]
+	msg = [255,255,255,22,254,254,254]
 	ser.write(msg)
-	time.sleep(0.1)	
-	ser.write(bytes(';', "ASCII"))
 	time.sleep(1)	
 	print(msg)
 	
 	
-	msg = []
+	msg = [255, 255, 255]
 	i = 2
 	while i<=5:
 		msg += [i] + pos_to_byte(0)
-		i= i +1
-	
+		i = i +1
+	msg += [254, 254, 254]
 	ser.write(msg)
-	time.sleep(0.01)	
-	ser.write(bytes(';', "ASCII"))
 	time.sleep(1)	
 	print(msg)
 	
-	msg = []
+	msg = [255, 255, 255]
 	i = 2
 	while i<=5:
 		msg += [i] + pos_to_byte(1000)
-		i= i +1
-	
+		i = i +1
+	msg += [254, 254, 254]
 	ser.write(msg)
-	time.sleep(0.01)	
-	ser.write(bytes(';', "ASCII"))
 	time.sleep(1)	
 	print(msg)
 	
