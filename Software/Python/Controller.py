@@ -20,6 +20,7 @@ class Controller(Thread):
         self.baud_rate = baud_rate
         self.buff = []
         self.last_send = time.time()
+        self.refresh_time = 0.2
         
             
     def run(self):
@@ -29,6 +30,7 @@ class Controller(Thread):
             self.IMU()
             self.send_new_targets()
             self.ask_motor_datas()
+            time.sleep(self.refresh_time - (time.time() - start))
             print(time.time() - start)
             
             
