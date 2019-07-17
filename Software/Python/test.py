@@ -1,5 +1,8 @@
 import time
 import serial
+from detect_USB import find_arduino
+
+
 POS1 = 1000
 POS2 = 30
 TIMEE = 0.1
@@ -10,7 +13,7 @@ def pos_to_byte(pos :int) -> [int, int]:
 	msb = (pos - lsb) // 256
 	return [msb,lsb]
 
-ser = serial.Serial('/dev/ttyUSB0', 115200)
+ser = serial.Serial(find_arduino(), 115200)
 count = 0
 
 #while count < 5:
@@ -32,6 +35,7 @@ count = 0
 	#time.sleep(TIMES)	
 	#print(msg)
 		
+
 	##ENVOI 2
 	#msg = []
 	#while i<=9:
@@ -179,31 +183,53 @@ count = 0
 	##time.sleep(0.5)	
 	##print(msg)
 
-while True:
-	
+nb_motor = 23     
+
+#while True:
+for i in range(5):
+	buff = []
 	msg = [255,255,255,22,254,254,254]
 	ser.write(msg)
-	time.sleep(1)	
+	time.sleep(0.11)
 	print(msg)
-	
-	
-	msg = [255, 255, 255]
-	i = 2
-	while i<=5:
-		msg += [i] + pos_to_byte(0)
-		i = i +1
-	msg += [254, 254, 254]
-	ser.write(msg)
+	while ser.in_waiting != 0: 
+		caract = int.from_bytes(ser.read(), byteorder='big')           
+		buff += [caract]
+		#print(caract)
+	print(buff)
 	time.sleep(1)	
-	print(msg)
+
 	
-	msg = [255, 255, 255]
-	i = 2
-	while i<=5:
-		msg += [i] + pos_to_byte(1000)
-		i = i +1
-	msg += [254, 254, 254]
-	ser.write(msg)
-	time.sleep(1)	
-	print(msg)
+	#msg = []
+	#msg = [255, 255, 255]
+	#i = 2
+	#while i <= nb_motor:
+		#msg += [i] + pos_to_byte(30)
+		#i = i +1
+	#msg += [254, 254, 254]
 	
+	#ser.write(msg)
+	##ser.flush()
+	##time.sleep(0.01)
+	##ser.write(msg[30:])
+	
+	
+	#time.sleep(1)	
+	#print(msg)
+	
+	
+	#msg = []
+	#msg = [255, 255, 255]
+	#i = 2
+	#while i <= nb_motor:
+		#msg += [i] + pos_to_byte(1000)
+		#i = i +1
+	#msg += [254, 254, 254]
+	
+	#ser.write(msg)
+	##ser.flush()
+	##time.sleep(0.01)
+	##ser.write(msg[30:])
+	
+	#time.sleep(1)	
+	#print(msg)

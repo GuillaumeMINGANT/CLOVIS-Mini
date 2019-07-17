@@ -19,14 +19,17 @@ class Controller(Thread):
         self.serial_port = serial_port
         self.baud_rate = baud_rate
         self.buff = []
+        self.last_send = time.time()
         
             
     def run(self):
         self.is_running = True
         while self.is_running :
+            start = time.time()
             self.IMU()
             self.send_new_targets()
             self.ask_motor_datas()
+            print(time.time() - start)
             
             
     def stop(self):
@@ -43,24 +46,21 @@ class Controller(Thread):
         motor_targets = self.server.get_targets_data()
         
         message = [255, 255, 255]
-        #time.sleep(0.02)
         for i in motor_targets_change : 
             if motor_targets_change[i] == True:
                 message += [motor_id[i]] + Controller.pos_to_bytes(int((motor_targets[i] + 180) * 2.84))
                 self.server.set_motor_change({i:False}) 
         message += [254, 254, 254]
-        self.ser.write(message)
-        
-        #time.sleep((len(message) / self.baud_rate))    #  avoid the overflow of the buffer
-        time.sleep(0.3) #DEBUG
-                
+        if len(message) > 6:
+            self.ser.write(message)
+                   
+                            
     def ask_motor_datas(self):
         motor_id = self.server.get_motor_id()
         nb_motors = len(motor_id)
-        
         msg = [255, 255, 255, nb_motors, 254, 254, 254]
         self.ser.write(msg)
-        time.sleep(0.002 * nb_motors + 0.005)
+        time.sleep(0.005 * nb_motors)
         
         try:
             

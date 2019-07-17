@@ -1,3 +1,4 @@
+
 #include <ax12.h>
 #include <BioloidController.h>
 
@@ -19,6 +20,11 @@ unsigned char * id;
 unsigned int * pos;
 unsigned char * data;
 
+void clear_buffer()
+{
+  top_buffer = 0;         
+}
+
 char find_lsb(int value){
   return (char)(value % 256);
 }
@@ -34,25 +40,26 @@ boolean read_message(){
    */
   if(top_buffer % 3 == 0 && top_buffer != 0){
     for(int i = 1; i < (top_buffer / 3) - 1; i++){
-      id[i] = buffer[i * 3];
+      id[i - 1] = buffer[i * 3];
       int new_pos = buffer[i * 3 + 1] * 256 + buffer[i * 3 + 2];
       if(new_pos < 0){
-        pos[i] = 0;
+        pos[i - 1] = 0;
       }
       else if(new_pos > 1023){
-        pos[i] = 1023;
+        pos[i - 1] = 1023;
       }
       else{
-      pos[i] = new_pos;
+        pos[i - 1] = new_pos;
       }
     }
-    id_len = top_buffer / 3;
+    id_len = (top_buffer / 3) - 1;
+
     pos_len = id_len;
-    top_buffer = 0;
+    clear_buffer();     
     buffer_is_full = false;
     return true;
   }
-  
+
   if(top_buffer == 7){  // Send motor's data
     data[0] = (char)255; 
     data[1] = (char)255;
@@ -60,29 +67,29 @@ boolean read_message(){
     for(char i=0; i<buffer[3]; i++)
     {
       data[(i * 7) + 3] = (int)(i + FIRST_ID);
-      
+
       int temp = (int)GetPosition(i + FIRST_ID);
       data[(i * 7) + 4] = find_msb(temp);
       data[(i * 7) + 5] = find_lsb(temp);
-      
+
       temp = (int)GetSpeed(i + FIRST_ID);
       data[(i * 7) + 6] = find_msb(temp);
       data[(i * 7) + 7] = find_lsb(temp);
-      
+
       temp = (int)GetTorque(i + FIRST_ID);
       data[(i * 7) + 8] = find_msb(temp);
       data[(i * 7) + 9] = find_lsb(temp);
-      } 
-      
+    } 
+
     data[(NB_MOTORS * 7) + 3] = 254; 
     data[(NB_MOTORS * 7) + 4] = 254;
     data[(NB_MOTORS * 7) + 5] = 254;
 
     for (int i = 0; i < (NB_MOTORS * 7) + 6; i++){
       Serial.write(data[i]);
-    }    
-    }
-  top_buffer = 0;         
+    }  
+  }
+  clear_buffer();         
   buffer_is_full = false;
   return false;
 }
@@ -130,12 +137,12 @@ void setup(){
 
 void loop(){
   if(Serial.available()){
-    
+
     if(!buffer_is_full){
       buffer[top_buffer] = Serial.read();
       top_buffer += 1;
-      
-      
+
+
       if(top_buffer == 3){
         if(buffer[0] != 255 || buffer[1] != 255 || buffer[2] != 255){         
           buffer[0] = buffer[1];
@@ -143,22 +150,22 @@ void loop(){
           top_buffer -= 1;          
         }
       }
-     if(top_buffer > 6){
-       if(buffer[top_buffer - 3] == 254 && buffer[top_buffer - 2] == 254 && buffer[top_buffer - 1] == 254){
-         buffer_is_full = true;           
-       }
-     }
-        
+      if(top_buffer > 6){
+        if(buffer[top_buffer - 3] == 254 && buffer[top_buffer - 2] == 254 && buffer[top_buffer - 1] == 254){
+          buffer_is_full = true;           
+        }
+      }
+
 
     }
     else{     
       if(read_message()){
-         move_motors();      
+        move_motors();      
       }
     }
 
 
   }
-    delay(1);
 }
+
 
