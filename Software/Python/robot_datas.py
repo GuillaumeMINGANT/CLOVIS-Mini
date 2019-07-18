@@ -70,52 +70,19 @@ class RobotDatas:
         return json.dumps(dict(self))
 
     def init_angle_settings(self):
-        self.angle_settings["rAnkleRX"] = [-180, 180]
-        self.angle_settings["lAnkleRX"] = [-180, 180]
-        self.angle_settings["rAnkleRZ"] = [-180, 180]
-        self.angle_settings["lAnkleRZ"] = [-180, 180]
-        self.angle_settings["rShoulderRY"] = [-180, 180]
-        self.angle_settings["lShoulderBaseRY"] = [-180, 180]
-        self.angle_settings["rShoulderBaseRY"] = [-180, 180]
-        self.angle_settings["lShoulderRY"] = [-180, 180]
-        self.angle_settings["rShoulderRZ"] =[-180, 180]
-        self.angle_settings["lShoulderRZ"] = [-180, 180]
-        self.angle_settings["rKneeRX"] = [-180, 180]
-        self.angle_settings["lKneeRX"] = [-180, 180]
-        self.angle_settings["rHipRX"] = [-180, 180]
-        self.angle_settings["lHipRX"] = [-180, 180]
-        self.angle_settings["rHipRY"] = [-180, 180]
-        self.angle_settings["lHipRY"] = [-180, 180]
-        self.angle_settings["rHipRZ"] = [-180, 180]
-        self.angle_settings["lHipRZ"] = [-180, 180]
-        self.angle_settings["headRX"] = [-180, 180]
-        self.angle_settings["rElbowRX"] = [-180, 180]
-        self.angle_settings["lElbowRX"] = [-180, 180]
-        self.angle_settings["torsoRY"] = [-180, 180]
-        """ 
-        self.angle_settings["rAnkleRX"] = [-180, 180]
-        self.angle_settings["lAnkleRX"] = [-180, 180]
-        self.angle_settings["rAnkleRZ"] = [-30, 30]
-        self.angle_settings["lAnkleRZ"] = [-30, 30]
-        self.angle_settings["rShoulderRY"] = [-90, 0]
-        self.angle_settings["lShoulderBaseRY"] = [-30, 30]
-        self.angle_settings["rShoulderBaseRY"] = [-30, 30]
-        self.angle_settings["lShoulderRY"] = [0, 90]
-        self.angle_settings["rShoulderRZ"] = [-90, 90]
-        self.angle_settings["lShoulderRZ"] = [-90, 90]
-        self.angle_settings["rKneeRX"] = [-60, 0]
-        self.angle_settings["lKneeRX"] = [-0, 60]
-        self.angle_settings["rHipRX"] = [-90, 30]
-        self.angle_settings["lHipRX"] = [-30, 90]
-        self.angle_settings["rHipRY"] = [0, 90]
-        self.angle_settings["lHipRY"] = [-90, 0]
-        self.angle_settings["rHipRZ"] = [-20, 90]
-        self.angle_settings["lHipRZ"] = [-90, 20]
-        self.angle_settings["headRX"] = [-20, 20]
-        self.angle_settings["rElbowRX"] = [0, 90]
-        self.angle_settings["lElbowRX"] = [-90, 0]
-        self.angle_settings["torsoRY"] = [-90, 90]
-        """
+        with open("motors_settings", "r") as content:
+                motors_settings = {}
+                content = [i.split("=") for i in content.read().split("\n")]
+                for i in content:
+                        motors_settings[i[0]] = i[1].split(",")
+                        for j, e in enumerate(motors_settings[i[0]]):
+                                motors_settings[i[0]][j] = int(e)
+        
+        for i in motors_settings:
+                self.angle_settings[i] = motors_settings[i]
+                
+        print(self.angle_settings)
+
 
     def set_targets(self, input_target: Dict[str, float]):
         for i in input_target:

@@ -3,13 +3,9 @@ from Controller import *
 import time
 from detect_USB import find_arduino
 from subprocess import check_output
-import os
-
 
 hotspot = False
 
-print(os.getcwd())
-#os.chdir(os.getcwd())
 with open("server_settings", "r") as content:
 	server_settings = {}
 	content = [i.split("=") for i in content.read().split("\n")]
@@ -31,12 +27,9 @@ server.start()
 controller = Controller(server, find_arduino(), int(server_settings["baud_rate"]))
 controller.start()
 
-count = 0
-tst = 0
-while count<20:
+while True:
     time.sleep(0.5)
-    count += 1
-    tst += 1
+
      
 controller.stop()
 server.stop()
