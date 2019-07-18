@@ -3,33 +3,39 @@ from Controller import *
 import time
 from detect_USB import find_arduino
 from subprocess import check_output
+import os
 
 
 hotspot = False
+
+print(os.getcwd())
+#os.chdir(os.getcwd())
+with open("server_settings", "r") as content:
+	server_settings = {}
+	content = [i.split("=") for i in content.read().split("\n")]
+	for i in content:
+		server_settings[i[0]] = i[1]
+
 while hotspot == False:
     
     wifi_ip = check_output(['hostname', '-I'])
     wifi_ip = wifi_ip.decode("utf-8")[:-2].split(" ")
     for i in wifi_ip:
-        if i == '192.168.50.1':
+        if i == server_settings["server_ip"]:
             hotspot = True
             
 
-server = UDPServer("192.168.50.1", 50055, "test")
+server = UDPServer(server_settings["server_ip"], int(server_settings["server_port"]), server_settings["server_password"])
 server.start()
 
-controller = Controller(server, find_arduino(), 115200)
+controller = Controller(server, find_arduino(), int(server_settings["baud_rate"]))
 controller.start()
 
 count = 0
 tst = 0
-while count<2000:
+while count<20:
     time.sleep(0.5)
     count += 1
-    #controller.send_new_targets()
-    # controller.ask_motor_datas()
-    #print(str(server.get_current_position_data()["rAnkleRZ"]) + ':' + str(server.get_motor_speed()["rAnkleRZ"]) + ':' + str(server.get_motor_torque()["rAnkleRZ"]))
-    #print(tst) 
     tst += 1
      
 controller.stop()

@@ -12,6 +12,15 @@ import serial
 class Controller(Thread):
 
     def __init__(self, server: UDPServer, serial_port: str, baud_rate: int):
+        """
+        Create a thread that send the new positions and refresh the sensor value
+        :param server:
+        The server where data are saved
+        :param serial_port:
+        The port the Arbotix-M is connected on
+        :param baud_rate:
+        The baudrate used to communicate to the Arbotix-M
+        """
         Thread.__init__(self)
         self.server = server
         self.is_running = False
@@ -24,25 +33,47 @@ class Controller(Thread):
         
             
     def run(self):
+        """
+        Start the Thread 
+        :return:
+        None
+        """
         self.is_running = True
         while self.is_running :
             start = time.time()
             self.IMU()
             self.send_new_targets()
             self.ask_motor_datas()
-            time.sleep(self.refresh_time - (time.time() - start))
-            print(time.time() - start)
+            
+            temp = self.refresh_time - (time.time() - start)
+            if temp > 0:
+                time.sleep(temp)
             
             
     def stop(self):
+        """
+        Stop the Thread 
+        :return:
+        None
+        """
         self.is_running = False
         
     def pos_to_bytes(pos :int) -> [int, int]:
+        """
+        Change position to bytes
+        :return:
+        Two integers that represent the two bytes
+        """
         lsb = pos % 256
         msb = (pos - lsb) // 256
         return [msb,lsb]
     
     def send_new_targets(self):
+        """
+        Send the goal position of the motors to the Arbotix-M
+        :return:
+        None
+        """
         motor_targets_change = self.server.get_motor_targets_change()
         motor_id = self.server.get_motor_id()
         motor_targets = self.server.get_targets_data()
@@ -58,6 +89,11 @@ class Controller(Thread):
                    
                             
     def ask_motor_datas(self):
+        """
+        Refresh the value of the motor sensors (position, speed and torque)
+        :return:
+        None
+        """
         motor_id = self.server.get_motor_id()
         nb_motors = len(motor_id)
         msg = [255, 255, 255, nb_motors, 254, 254, 254]
@@ -91,6 +127,11 @@ class Controller(Thread):
         
             
     def IMU(self):
+        """
+        Refresh the inertial measurement unit values 
+        :return:
+        None
+        """
         input_data: Dict[str, float] = {}
         
         try:
