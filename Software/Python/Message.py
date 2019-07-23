@@ -38,10 +38,8 @@ class Message:
         Bool (True if not corrupted, else False)
         """
         if self.parity_check(bytes(self.message, "utf8")) != self.parity:
-            print("Fatal Error: parity")
             return False
         elif len(self.message) != self.len:
-            print("Fatal Error : length")
             return False
         else:
             return True
@@ -56,10 +54,8 @@ class Message:
         try:
             message = Message.create_from_json(data_string)
         except ValueError:
-            print("Validation KO")
             return Message(0, "")
         if message.verif():
-            #print("received message:", message.message)
             return message
         else:
             return Message(0, "")

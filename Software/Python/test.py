@@ -186,59 +186,59 @@ count = 0
 nb_motor = 23     
 
 #while True:
-#for i in range(5):
-	#buff = []
-	#msg = [255,255,255,22,254,254,254]
-	#ser.write(msg)
-	#time.sleep(0.11)
-	#print(msg)
-	#while ser.in_waiting != 0: 
-		#caract = int.from_bytes(ser.read(), byteorder='big')           
-		#buff += [caract]
-		##print(caract)
-	#print(buff)
-	#time.sleep(1)	
+for i in range(5):
+	buff = []
+	msg = [255,255,255,22,254,254,254]
+	ser.write(msg)
+	time.sleep(0.11)
+	print(msg)
+	while ser.in_waiting != 0: 
+		caract = int.from_bytes(ser.read(), byteorder='big')           
+		buff += [caract]
+		#print(caract)
+	print(buff)
+	time.sleep(1)	
 
 	
-	#msg = []
-	#msg = [255, 255, 255]
-	#i = 2
-	#while i <= nb_motor:
-		#msg += [i] + pos_to_byte(30)
-		#i = i +1
-	#msg += [254, 254, 254]
+	msg = []
+	msg = [255, 255, 255]
+	i = 2
+	while i <= nb_motor:
+		msg += [i] + pos_to_byte(30)
+		i = i +1
+	msg += [254, 254, 254]
 	
-	#ser.write(msg)
-	##ser.flush()
-	##time.sleep(0.01)
-	##ser.write(msg[30:])
-	
-	
-	#time.sleep(1)	
-	#print(msg)
+	ser.write(msg)
+	#ser.flush()
+	#time.sleep(0.01)
+	#ser.write(msg[30:])
 	
 	
-	#msg = []
-	#msg = [255, 255, 255]
-	#i = 2
-	#while i <= nb_motor:
-		#msg += [i] + pos_to_byte(1000)
-		#i = i +1
-	#msg += [254, 254, 254]
+	time.sleep(1)	
+	print(msg)
 	
-	#ser.write(msg)
-	##ser.flush()
-	##time.sleep(0.01)
-	##ser.write(msg[30:])
 	
-	#time.sleep(1)	
-	#print(msg)
+	msg = []
+	msg = [255, 255, 255]
+	i = 2
+	while i <= nb_motor:
+		msg += [i] + pos_to_byte(1000)
+		i = i +1
+	msg += [254, 254, 254]
+	
+	ser.write(msg)
+	#ser.flush()
+	#time.sleep(0.01)
+	#ser.write(msg[30:])
+	
+	time.sleep(1)	
+	print(msg)
 
-from subprocess import check_output
-wifi_ip = check_output(['hostname', '-I'])
-wifi_ip = wifi_ip.decode("utf-8")[:-2].split(" ")
-for i in wifi_ip:
-	if i == '192.168.50.1':
+#from subprocess import check_output
+#wifi_ip = check_output(['hostname', '-I'])
+#wifi_ip = wifi_ip.decode("utf-8")[:-2].split(" ")
+#for i in wifi_ip:
+	#if i == '192.168.50.1':
 		
 
 

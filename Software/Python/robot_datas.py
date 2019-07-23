@@ -47,7 +47,7 @@ class RobotDatas:
         
         self.motor_targets_change : Dict[str, bool] = {}
         for i in self.motor_keys:
-             self.motor_targets_change[i] = False
+             self.motor_targets_change[i] = True
              
         self.motor_torque : Dict[str, int] = {}
         for i in self.motor_keys:
@@ -57,6 +57,7 @@ class RobotDatas:
         for i in self.motor_keys:
              self.motor_speed[i] = 0
         
+        self.init_motor_id()
         self.init_angle_settings()
 
     def __iter__(self):
@@ -74,15 +75,22 @@ class RobotDatas:
                 motors_settings = {}
                 content = [i.split("=") for i in content.read().split("\n")]
                 for i in content:
-                        motors_settings[i[0]] = i[1].split(",")
-                        for j, e in enumerate(motors_settings[i[0]]):
-                                motors_settings[i[0]][j] = int(e)
+                        if(len(i) == 2):
+                                motors_settings[i[0]] = i[1].split(",")
+                                for j, e in enumerate(motors_settings[i[0]]):
+                                        motors_settings[i[0]][j] = int(e)
         
         for i in motors_settings:
                 self.angle_settings[i] = motors_settings[i]
-                
-        print(self.angle_settings)
+        
 
+    def init_motor_id(self):
+        with open("motors_id", "r") as content:
+                content = [i.split("=") for i in content.read().split("\n")]
+                for i in content:
+                        if(len(i) == 2):
+                                self.motor_id[i[0]] = int(i[1])
+        
 
     def set_targets(self, input_target: Dict[str, float]):
         for i in input_target:

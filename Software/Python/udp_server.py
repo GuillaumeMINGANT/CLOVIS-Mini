@@ -170,10 +170,8 @@ class UDPServer:
             """
 
             if self.hash_pass == pass_to_verif:
-                print("Password accepted")
                 return True
             else:
-                print("Fatal Error : password error")
                 return False
 
         def connection(self, message: Message, addr):
